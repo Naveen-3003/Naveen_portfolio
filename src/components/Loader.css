@@ -1,0 +1,104 @@
+.loader-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+  overflow: hidden;
+}
+
+.loader-screen.fade-out {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-content {
+  text-align: center;
+  z-index: 2;
+}
+
+.loader-logo {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.loader-letter {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: letterBounce 1.5s ease infinite;
+}
+
+.loader-letter:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.loader-letter:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes letterBounce {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-16px); }
+  50% { transform: translateY(0); }
+}
+
+.loader-bar-track {
+  width: 240px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.loader-bar-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 4px;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 12px rgba(79, 143, 255, 0.5);
+}
+
+.loader-text {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  font-family: var(--font-display);
+}
+
+.loader-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+}
+
+.loader-orb-1 {
+  width: 300px;
+  height: 300px;
+  background: var(--accent-blue);
+  top: -100px;
+  right: -100px;
+  animation: float 4s ease-in-out infinite;
+}
+
+.loader-orb-2 {
+  width: 250px;
+  height: 250px;
+  background: var(--accent-purple);
+  bottom: -80px;
+  left: -80px;
+  animation: float 5s ease-in-out infinite reverse;
+}
