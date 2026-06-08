@@ -30,7 +30,7 @@ export default function Contact() {
 
     if (!accessKey) {
       setStatus('error');
-      setErrorMessage('Please set up your VITE_WEB3FORMS_ACCESS_KEY in the .env file.');
+      setErrorMessage('Access key required');
       setTimeout(() => {
         setStatus('idle');
       }, 5000);
