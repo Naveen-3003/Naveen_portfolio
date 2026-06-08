@@ -135,9 +135,31 @@
 }
 
 .form-submit-btn:disabled {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
-  cursor: default;
+  cursor: not-allowed;
+}
+
+.form-submit-btn.success {
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3) !important;
+}
+
+.form-submit-btn.submitting {
+  opacity: 0.8;
+  cursor: wait !important;
+}
+
+.form-submit-btn.error {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3) !important;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 768px) {

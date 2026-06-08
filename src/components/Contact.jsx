@@ -4,7 +4,8 @@ import './Contact.css';
 export default function Contact() {
   const sectionRef = useRef(null);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -20,13 +21,61 @@ export default function Contact() {
     return () => reveals?.forEach((el) => observer.unobserve(el));
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({ name: '', email: '', message: '' });
-    }, 3000);
+    setStatus('submitting');
+    setErrorMessage('');
+
+    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+
+    if (!accessKey) {
+      setStatus('error');
+      setErrorMessage('Please set up your VITE_WEB3FORMS_ACCESS_KEY in the .env file.');
+      setTimeout(() => {
+        setStatus('idle');
+      }, 5000);
+      return;
+    }
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: accessKey,
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          subject: `Portfolio Contact Form: Message from ${formData.name}`,
+          from_name: formData.name,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setStatus('success');
+        setFormData({ name: '', email: '', message: '' });
+        setTimeout(() => {
+          setStatus('idle');
+        }, 4000);
+      } else {
+        setStatus('error');
+        setErrorMessage(data.message || 'Something went wrong. Please try again.');
+        setTimeout(() => {
+          setStatus('idle');
+        }, 5000);
+      }
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage('Network error. Please check your connection.');
+      setTimeout(() => {
+        setStatus('idle');
+      }, 5000);
+    }
   };
 
   return (
@@ -123,19 +172,42 @@ export default function Contact() {
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-primary form-submit-btn" id="btn-send-message" disabled={submitted}>
-                {submitted ? (
+              <button
+                type="submit"
+                className={`btn btn-primary form-submit-btn ${status}`}
+                id="btn-send-message"
+                disabled={status === 'submitting' || status === 'success'}
+              >
+                {status === 'submitting' && (
                   <>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg className="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" style={{ animation: 'spin 1s linear infinite', marginRight: '8px' }}><circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.25" /><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" /></svg>
+                    Sending...
+                  </>
+                )}
+                {status === 'success' && (
+                  <>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}><polyline points="20 6 9 17 4 12"/></svg>
                     Message Sent!
                   </>
-                ) : (
+                )}
+                {status === 'error' && (
                   <>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                    Failed to Send
+                  </>
+                )}
+                {status === 'idle' && (
+                  <>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                     Send Message
                   </>
                 )}
               </button>
+              {status === 'error' && errorMessage && (
+                <p className="form-error-message" style={{ color: '#ef4444', marginTop: '12px', fontSize: '0.9rem', textAlign: 'center', background: 'rgba(239, 68, 68, 0.1)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                  {errorMessage}
+                </p>
+              )}
             </form>
           </div>
         </div>
